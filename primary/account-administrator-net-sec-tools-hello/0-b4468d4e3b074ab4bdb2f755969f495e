@@ -1,0 +1,9 @@
+{
+  "_id": "account-administrator-net-sec-tools-hello",
+  "pid": "account-administrator-net-sec-tools",
+  "type": "message",
+  "from": "administrator@local",
+  "name": "Welcome",
+  "deleted": false,
+  "text": "Hey, we just created your new box."
+}

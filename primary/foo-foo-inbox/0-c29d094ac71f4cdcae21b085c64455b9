@@ -1,0 +1,7 @@
+{
+  "_id": "foo-foo-inbox",
+  "pid": "foo-foo",
+  "type": "mailbox",
+  "name": "Inbox",
+  "description": "Inbox for foo@foo"
+}

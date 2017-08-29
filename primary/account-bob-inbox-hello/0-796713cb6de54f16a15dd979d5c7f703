@@ -1,0 +1,15 @@
+{
+  "_id": "account-bob-inbox-hello",
+  "pid":"account-bob-inbox",
+  "type": "message",
+  "from": "alice@example.com",
+  "name": "Yo Bob!",
+  "deleted": false,
+  "text": "Hey, Bobby, do you wanna golf?",
+  "negative": [
+    {"type":"noop"}
+  ],
+  "positive": [
+    {"type":"mail", "data":{}}
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "_id": "daria-example-com",
+  "type": "account",
+  "name": "Daria's World",
+  "address": "daria@example.com",
+  "color": "#000000",
+  "phone": "1-734-555-1212",
+  "_rev": "1-9cdbdad7a0dc49fc9fd22a8c99f746cf",
+  "deleted": true
+}

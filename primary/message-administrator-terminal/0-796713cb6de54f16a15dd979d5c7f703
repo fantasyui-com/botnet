@@ -1,0 +1,14 @@
+{
+  "_id": "message-administrator-terminal",
+  "pid":"account-administrator-toolbox",
+  "type": "message",
+  "from": "bot@local",
+  "name": "Terminal",
+  "deleted": false,
+
+  "text": "System terminal, type help to see a list of commands.",
+
+  "component": "terminal"
+
+
+}

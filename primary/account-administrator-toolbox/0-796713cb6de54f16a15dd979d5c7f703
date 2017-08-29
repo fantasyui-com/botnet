@@ -1,0 +1,7 @@
+{
+  "_id": "account-administrator-toolbox",
+  "pid":"account-administrator",
+  "type": "mailbox",
+  "name": "Toolbox",
+  "description": "Inbox for administrator@example.com"
+}

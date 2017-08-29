@@ -1,0 +1,8 @@
+{
+  "_id": "account-bob",
+  "type": "account",
+  "name": "Bob's Email",
+  "address": "bob@example.com",
+  "_rev": "1-796f3b26cd9649eaa6bb6ea5c927212a",
+  "deleted": true
+}

@@ -1,0 +1,7 @@
+{
+  "_id": "manager-local-inbox",
+  "pid": "manager-local",
+  "type": "mailbox",
+  "name": "Inbox",
+  "description": "Inbox for manager@local"
+}

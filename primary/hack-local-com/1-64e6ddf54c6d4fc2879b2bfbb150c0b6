@@ -1,0 +1,8 @@
+{
+  "_id": "hack-local-com",
+  "type": "account",
+  "name": "Hacker",
+  "address": "hack@local.com",
+  "_rev": "1-64e6ddf54c6d4fc2879b2bfbb150c0b6",
+  "deleted": true
+}

@@ -1,0 +1,13 @@
+{
+  "_id": "message-administrator-addmailbox",
+  "pid":"account-administrator-toolbox",
+  "type": "message",
+  "from": "bot@local",
+  "name": "Add Mailbox Form",
+  "deleted": false,
+
+  "text": "Use this form to add new mailboxes.",
+
+  "component": "addbox"
+
+}

@@ -1,0 +1,6 @@
+{
+  "_id": "account-administrator",
+  "type": "account",
+  "name": "Administrator",
+  "address": "administrator@example.com"
+}

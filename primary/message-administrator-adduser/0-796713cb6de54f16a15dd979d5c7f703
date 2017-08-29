@@ -1,0 +1,14 @@
+{
+  "_id": "message-administrator-adduser",
+  "pid":"account-administrator-toolbox",
+  "type": "message",
+  "from": "bot@local",
+  "name": "Add User Account Form",
+  "deleted": false,
+
+  "text": "Use this form to add new accounts.",
+
+  "component": "adduser"
+
+
+}
