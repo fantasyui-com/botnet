@@ -68,9 +68,8 @@ module.exports = {
        this.action = null;
     },
 
-    submit(event){
+    submit(){
       if(this.action) this.$store.dispatch(this.action);
-      event.preventDefault();
     },
 
     match () {
