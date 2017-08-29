@@ -1,6 +1,8 @@
 # Botnet
 Electron based communication program driven by robotic network entities inspired by email and robots.
 
+Aim of this project is to create a low overhead Mechanical Turk for simple human oriented task processing.
+
 ![](screenshot.png)
 
 ## Using this project
