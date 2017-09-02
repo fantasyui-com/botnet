@@ -4,12 +4,31 @@ module.exports = {
 
 
 
-        type: "adduser",
-        name:"",
+        type: "sendmail",
+
         address:"",
+        box:"",
+
+        name:"",
+        text:"",
+
+        component:"",
 
     }
   },
+
+  computed: {
+    from() {
+      return (this.$store.getters.byType('account').filter(account => account._id === this.$store.state.local.selected.account)[0]||{}).address;
+    },
+    accounts() {
+      return this.$store.getters.byType('account');
+    },
+    count () {
+      return this.$store.state.count
+    },
+  },
+
   template: `
     <form>
 
@@ -20,11 +39,16 @@ module.exports = {
             To
           </button>
           <div class="dropdown-menu">
-            <a v-for="account in accounts" class="dropdown-item" v-on:click="user=account.address" href="#">{{account.address}}</a>
+            <a v-for="account in accounts" class="dropdown-item" v-on:click="address=account.address" href="#">{{account.address}}</a>
           </div>
         </div>
-          <input type="text" class="form-control" v-model="user" id="user" aria-label="Text input with dropdown button">
+          <input type="text" class="form-control" v-model="address" id="address" aria-label="Text input with dropdown button">
         </div>
+      </div>
+
+      <div class="form-group">
+        <label for="name">From</label>
+        <input v-model="from" type="text" readonly class="form-control-plaintext" id="from" style="width: 100%;">
       </div>
 
       <div class="form-group">
@@ -32,27 +56,25 @@ module.exports = {
         <input v-model="name" class="form-control" id="name" placeholder="Hello">
       </div>
 
-
-
       <div class="form-group">
         <label for="name">Box</label>
-        <input v-model="box" class="form-control" id="name" placeholder="Inbox">
+        <input v-model="box" class="form-control" id="box" placeholder="Inbox">
       </div>
 
       <div class="form-group">
-        <label for="exampleFormControlTextarea1">Text</label>
-        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+        <label for="text">Text</label>
+        <textarea v-model="text" class="form-control" id="text" rows="3"></textarea>
       </div>
 
       <div class="form-group">
-        <label for="exampleFormControlSelect1">Component</label>
-        <select class="form-control" id="exampleFormControlSelect1">
+        <label for="component">Component</label>
+        <select v-model="component" class="form-control" id="component">
           <option value="">none</option>
-          <option>addbox</option>
-          <option>adduser</option>
-          <option>contact</option>
-          <option>deluser</option>
-          <option>terminal</option>
+          <option id="addbox">Add Box</option>
+          <option id="adduser">Add User</option>
+          <option id="contact">Contact</option>
+          <option id="deluser">Delete User</option>
+          <option id="terminal">Terminal</option>
         </select>
       </div>
 
@@ -62,26 +84,30 @@ module.exports = {
 
     </form>
   `,
-  computed: {
-    accounts() {
-      return this.$store.getters.byType('account'); //
-    },
-    count () {
-      return this.$store.state.count
-    },
-  },
+
   methods: {
 
     submit (event) {
 
        this.$store.dispatch({
+
          type: this.type,
-         name: this.name,
+         from: this.from,
+
          address: this.address,
+         box: this.box,
+         name: this.name,
+         text: this.text,
+         component: this.component,
+
        });
 
-       this.name = "";
+
        this.address = "";
+       this.box = "";
+       this.name = "";
+       this.text = "";
+       this.component = "";
 
        this.$store.commit('deselect', ['messages', 'message']);
 
@@ -89,8 +115,12 @@ module.exports = {
 
     reset (event) {
 
-      this.name = "";
+
       this.address = "";
+      this.box = "";
+      this.name = "";
+      this.text = "";
+      this.component = "";
 
       this.$store.commit('deselect', ['messages', 'message']);
     },

@@ -6,6 +6,8 @@ Aim of this project is to create a low overhead Mechanical Turk for simple human
 ![](screenshot.png)
 ![](screenshot-1.png)
 ![](screenshot-2.png)
+![](screenshot-3.png)
+![](screenshot-4.png)
 
 ## Using this project
 

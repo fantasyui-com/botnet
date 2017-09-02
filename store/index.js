@@ -1,5 +1,5 @@
 const kebabCase = require("lodash/kebabCase")
-
+const shortid = require('shortid');
 
 module.exports = async function(options){
 
@@ -159,6 +159,43 @@ module.exports = async function(options){
 
       },
 
+
+      async sendmail({ commit, state }, { from, address, box, name, text, component }) {
+
+        const account = this.getters.byType('account').filter(account => account.address === address);
+        const userPid = (account[0]||{})._id;
+
+        const inbox =  this.getters.byType('mailbox').filter(mailbox => mailbox.pid === userPid).filter(mailbox => mailbox.name === 'Inbox');
+        const inboxPid = (inbox[0]||{})._id;
+
+        await multiprocessStore.upsertObject({
+          _id: kebabCase(account._id + '-' + 'message') + '-' + shortid.generate() ,
+          pid: inboxPid,
+          type: "message",
+
+          from,
+          name,
+          tags: box.split(",").map(i=>i.trim()),
+          deleted: false,
+          text,
+          component,
+        });
+
+        //
+        // if(!mailbox){
+        //
+        // }
+        //
+        // {
+        //   "_id": "alice-aol-com-inbox",
+        //   "pid": "alice-aol-com",
+        //   "type": "mailbox",
+        //   "name": "Inbox",
+        //   "description": "Inbox for alice@aol.com"
+        // }
+
+
+      },
 
       async poke({commit, state}, {name, id, data}) {
         let existingData = await multiprocessStore.getObject(id);

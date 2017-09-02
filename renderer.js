@@ -369,19 +369,22 @@ async function main(options) {
             <div class="card-body">
 
             <div class="container-fluid">
-              <div class="row">
-              <div class="col-4">
-              <h4 class="my-3 text-right">
-              <span class="py-2 mb-3 d-inline-block">
-              <i v-bind:class="messageIcon"></i>
-              </span>
-              </h4>
-              </div>
-              <div class="col-8">
-              <h4 class="my-3 pt-3">
-               {{message.name}}
-              </h4>
-              </div>
+              <div class="row align-items-center">
+
+                <div class="col-4">
+                  <h4 class="text-right">
+                    <span class="py-2 mb-3 d-inline-block">
+                      <i v-bind:class="messageIcon"></i>
+                    </span>
+                  </h4>
+                </div>
+
+                <div class="col-8">
+                  <h4 class="text-left py-2 mb-3">
+                   {{message.name}}
+                  </h4>
+                </div>
+
               </div>
             </div>
 
