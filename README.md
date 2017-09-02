@@ -4,6 +4,8 @@ Electron based communication program driven by robotic network entities inspired
 Aim of this project is to create a low overhead Mechanical Turk for simple human oriented task processing.
 
 ![](screenshot.png)
+![](screenshot-1.png)
+![](screenshot-2.png)
 
 ## Using this project
 
