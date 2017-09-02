@@ -1,7 +1,0 @@
-{
-  "_id": "account-administrator-net-sec-tools",
-  "pid": "account-administrator",
-  "type": "mailbox",
-  "name": "NetSec Tools",
-  "description": "NetSec Tools for administrator@example.com"
-}

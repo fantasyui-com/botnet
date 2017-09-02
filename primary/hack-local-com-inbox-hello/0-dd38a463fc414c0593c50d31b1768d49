@@ -1,9 +1,0 @@
-{
-  "_id": "hack-local-com-inbox-hello",
-  "pid": "hack-local-com-inbox",
-  "type": "message",
-  "from": "administrator@local",
-  "name": "Welcome",
-  "deleted": false,
-  "text": "Welcome to the system hack@local.com"
-}

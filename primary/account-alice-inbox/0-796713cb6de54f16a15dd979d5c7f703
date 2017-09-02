@@ -1,7 +1,0 @@
-{
-  "_id": "account-alice-inbox",
-  "pid":"account-alice",
-  "type": "mailbox",
-  "name": "Inbox",
-  "description": "Inbox for alice@example.com"
-}

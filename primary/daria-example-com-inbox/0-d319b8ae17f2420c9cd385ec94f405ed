@@ -1,7 +1,0 @@
-{
-  "_id": "daria-example-com-inbox",
-  "pid": "daria-example-com",
-  "type": "mailbox",
-  "name": "Inbox",
-  "description": "Inbox for daria@example.com"
-}

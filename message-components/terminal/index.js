@@ -10,7 +10,7 @@ module.exports = {
           keys:['name','address'],
           test: ({name,address}={name:'Thor',address:'thor@valhalla.com'})=>`Add user <span class="badge badge-dark">${name}</span> with address <span class="badge badge-dark">${address}</span>`,
           text: 'Add user ? with address ?',
-          expressions: [
+          list: [
             XRegExp(`^Add user (?<name>[a-zA-Z0-9-]{3,}) with address (?<address>[.@a-zA-Z0-9-]{1,}@[.@a-zA-Z0-9-]{1,})$`),
           ],
         },
@@ -78,8 +78,8 @@ module.exports = {
         const pattern = this.patterns[i];
         let match = null;
 
-        for(let index = 0; index<pattern.expressions.length;index++){
-          let expression = pattern.expressions[index];
+        for(let index = 0; index<pattern.list.length;index++){
+          let expression = pattern.list[index];
           match = XRegExp.exec(this.command, expression);
           if(match){
             break

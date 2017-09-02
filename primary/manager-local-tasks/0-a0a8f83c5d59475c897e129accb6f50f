@@ -1,7 +1,0 @@
-{
-  "_id": "manager-local-tasks",
-  "pid": "manager-local",
-  "type": "mailbox",
-  "name": "Tasks",
-  "description": "Tasks for manager@local"
-}

@@ -1,9 +1,0 @@
-{
-  "_id": "vader-att-inbox-hello",
-  "pid": "vader-att-inbox",
-  "type": "message",
-  "from": "administrator@local",
-  "name": "Welcome",
-  "deleted": false,
-  "text": "Welcome to the system vader@att"
-}

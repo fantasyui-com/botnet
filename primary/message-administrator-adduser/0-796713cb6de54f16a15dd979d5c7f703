@@ -1,10 +1,16 @@
 {
   "_id": "message-administrator-adduser",
-  "pid":"account-administrator-toolbox",
+  "pid":"account-administrator-inbox",
   "type": "message",
   "from": "bot@local",
   "name": "Add User Account Form",
+  "icon": "user-circle",
   "deleted": false,
+
+
+    "tags":["Tools", "User Management"],
+
+
 
   "text": "Use this form to add new accounts.",
 

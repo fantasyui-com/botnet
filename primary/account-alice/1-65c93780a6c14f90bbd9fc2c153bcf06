@@ -1,8 +1,0 @@
-{
-  "_id": "account-alice",
-  "type": "account",
-  "name": "Alice's Mail",
-  "address": "alice@example.com",
-  "_rev": "1-65c93780a6c14f90bbd9fc2c153bcf06",
-  "deleted": true
-}

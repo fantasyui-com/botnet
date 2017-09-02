@@ -1,8 +1,0 @@
-{
-  "_id": "foo-foo",
-  "type": "account",
-  "name": "Security",
-  "address": "foo@foo",
-  "_rev": "1-48af8bb49e2f49fd885b155f2c7c5049",
-  "deleted": true
-}

@@ -1,10 +1,13 @@
 {
   "_id": "message-administrator-terminal",
-  "pid":"account-administrator-toolbox",
+  "pid":"account-administrator-inbox",
   "type": "message",
   "from": "bot@local",
-  "name": "Terminal",
+  "icon": "terminal",
+  "name": "System Terminal",
   "deleted": false,
+
+  "tags":["Tools"],
 
   "text": "System terminal, type help to see a list of commands.",
 

@@ -9,385 +9,58 @@ const path = require('path');
 const EventEmitter = require('events');
 class MyEmitter extends EventEmitter {}
 const emitter = new MyEmitter();
-$(function(){ $('title').text(pkg.productName||pkg.name); });
 
-const objectStore = require('multiprocess-store');
-const chokidar = require('chokidar');
-const kebabCase = require("lodash/kebabCase")
-
-async function main(options){
+$(function() {
+  $('title').text(pkg.productName || pkg.name);
+});
 
 
+async function main(options) {
+
+  const store = await require(__dirname + '/store/index.js')(options);
 
 
+  const appAccounts = new Vue({
+    el: '#app-accounts',
+    store,
+    methods: {
 
-
-
-
-let storePath = path.resolve(options.primaryStore);
-const multiprocessStore = await objectStore.createStore(storePath);
-window.multiprocessStore = multiprocessStore;
-
-const multiprocessStorePlugin = function(store){
-
-
-
-  var watcher = chokidar.watch(storePath, {
-    depth: 1,
-    ignoreInitial: true,
-    ignored: /(^|[\/\\])\../,
-    persistent: true
-  });
-
-  var log = console.log.bind(console);
-  // Add event listeners.
-  watcher
-    .on('add', path => log(`add: File ${path} has been added`))
-    .on('change', path => log(`change: File ${path} has been changed`))
-    .on('unlink', path => log(`unlink: File ${path} has been removed`));
-
-  // More possible events.
-  watcher
-    .on('change', location => {
-      let relatives = path.relative(storePath, location).split(path.sep).filter(i=>i);
-      if(relatives.length === 2){
-        console.info(`Record Update, "${relatives[0]}" has been updated.`,relatives)
-
-        multiprocessStore.getObject(relatives[0]).then(data => {
-          console.info(`Record Data`,data)
-
-          store.commit('update', {name:options.primaryStore, id:relatives[0], data});
-
-        });
-      }
-    })
-    .on('add', location => {
-      let relatives = path.relative(storePath, location).split(path.sep).filter(i=>i);
-      if(relatives.length === 2){
-        console.info(`Record Update, "${relatives[0]}" has been updated.`,relatives)
-
-        multiprocessStore.getObject(relatives[0]).then(data => {
-          console.info(`Record Data`,data)
-
-          store.commit('update', {name:options.primaryStore, id:relatives[0], data});
-
-        });
-      }
-    })
-    .on('addDir', location => {
-
-      console.log(`addDir: Directory ${location} has been added`)
-      //console.log('RELATIVE', path.relative(storePath, location))
-      //console.log('BASENAME', path.basename( location))
-
-      let relatives = path.relative(storePath, location).split(path.sep).filter(i=>i);
-
-      //if(path.relative(storePath, location) && (path.relative(storePath, location) === path.basename(location))){
-      if(relatives.length === 1){
-        console.info(`New Record "${relatives[0]}" has been created.`, relatives)
-      }
-
-    })
-    .on('unlinkDir', path => log(`unlinkDir: Directory ${path} has been removed`))
-    .on('error', error => log(`error: Watcher error: ${error}`))
-    .on('ready', () => {
-
-      multiprocessStore.getAllObjects().then(list => {
-
-        list.forEach(data => store.commit('update', {name:options.primaryStore, id:data._id, data}) )
-
-
-      });
-
-    })
-    .on('raw', (event, path, details) => {
-      log('raw: Raw event info:', event, path, details);
-    });
-
-
-    // socket.on('data', data => {
-    //   store.commit('receiveData', data)
-    // })
-
-    store.subscribe((mutation, state) => {
-
-      /// console.log(`vuex: store mutation of type [${mutation.type}]`, mutation.payload, state);
-
-      if (mutation.type === 'UPDATE_DATA') {
-        //socket.emit('update', mutation.payload)
-      }
-
-    });
-
-  };
-
-
-  const store = new Vuex.Store({
-
-    plugins: [multiprocessStorePlugin],
-
-    state: {
-      local: {
-        selected: {},
+      isActive(account) {
+        return (this.$store.state.local.selected.account === account._id) ? "active" : "";
       },
 
-      primary:{}
-
-    },
-
-
-    getters: {
-
-      byType: (state, getters) => (type) => {
-        return Object
-        .keys(state.primary)
-        .map(key=>state.primary[key])
-        .filter(record => ( !(!!record.deleted)) )
-        .filter(record => record.type === type)
-      },
-
-      userAccount: (state, getters) => (id) => {
-        return getters.byType('account')
-          .filter(account => account.id === id)[0];
-       },
-
-      userAccountList: state => {
-        return state.accounts
-          .filter(record => record.type === 'account')
-          .filter(account => account.enabled)
-      },
-
-    },
-
-    mutations: {
-
-      select (state, {type, id}) {
-        Vue.set(state.local.selected, type, id);
-      },
-
-      deselect (state, things) {
-        things.forEach(type => Vue.set(state.local.selected, type, null))
-      },
-
-      update (state, {name, id, data}) {
-
-        if(state[name]){
-          // db exists
-        }else{
-          Vue.set(state, name, {});
-        }
-
-
-        if(state[name][id]){
-          state[name][id] = data;
-        }else{
-          Vue.set(state[name], id, data);
-        }
-
-
-      },
-
-    },
-
-    actions: {
-
-      async adduser ({ commit, state }, { name, address }) {
-
-        await multiprocessStore.upsertObject({
-          _id: kebabCase(address),
+      selectAccount(account) {
+        this.$store.commit('deselect', ['mailbox', 'smartbox', 'messages', 'message']);
+        this.$store.commit('select', {
           type: 'account',
-          name,
-          address
+          id: account._id
         });
+      },
+    },
 
-        await multiprocessStore.upsertObject({
-          _id: kebabCase(address+'-inbox'),
-          pid: kebabCase(address),
-          type: 'mailbox',
-          name: 'Inbox',
-          description: `Inbox for ${address}`
-        });
+    computed: {
 
-        await multiprocessStore.upsertObject({
-          _id: kebabCase(address+'-inbox-hello'),
-          pid: kebabCase(address+'-inbox'),
-          type: "message",
-          from: "administrator@local",
-          name: "Welcome",
-          deleted: false,
-          text: `Welcome to the system ${address}`,
-        });
-
+      accounts() {
+        return this.$store.getters.byType('account');
       },
 
-      async deluser ({ commit, state }, {id}) {
-        let existingData = await multiprocessStore.getObject(id);
-        await multiprocessStore.updateObject( Object.assign(existingData, {deleted:true}) );
-      },
+    },
 
-
-      async addbox ({ commit, state }, { name, pid }) {
-
-        const {address} = await multiprocessStore.getObject(pid);
-
-        await multiprocessStore.upsertObject({
-          _id: kebabCase(pid+'-'+name),
-          pid,
-          type: 'mailbox',
-          name,
-          description: `${name} for ${address}`
-        });
-
-        await multiprocessStore.upsertObject({
-          _id: kebabCase(pid+'-'+name+'-hello'),
-          pid: kebabCase(pid+'-'+name),
-          type: "message",
-          from: "administrator@local",
-          name: "Welcome",
-          deleted: false,
-          text: `Hey ${address}, we just created your new box.`,
-        });
-
-      },
-
-
-      async poke ({ commit, state }, {name, id, data}) {
-        let existingData = await multiprocessStore.getObject(id);
-        await multiprocessStore.updateObject( Object.assign(existingData, data) );
-        let updatedData = await multiprocessStore.getObject(id);
-        store.commit('update', {name, id, data:updatedData});
-
-      },
-
-    }
-
-  });
-
-
-
-
-  Vue.directive('init', {
-    bind: function (el,bi) {
-      // placeholder function to evale the v-setup
-    }
-  })
-
-  Vue.directive('setup', {
-    bind: function (el,bi) {
-      // placeholder function to evale the v-setup
-      el.value = bi.value;
-    }
-  })
-
-
-  //
-  //
-  // const app = new Vue({
-  //   el: '#app',
-  //   // provide the store using the "store" option.
-  //   // this will inject the store instance to all child components.
-  //   store,
-  //
-  //   methods: {
-  //     poke: function (event) {
-  //       store.dispatch('poke', {name:options.primaryStore, id:'foo', data:{hello:'barf'}});
-  //     },
-  //   },
-  //   computed: {
-  //
-  //     dump () {
-  //       return JSON.stringify(this.$store.state, null, '  ');
-  //     },
-  //
-  //     primary () {
-  //       return this.$store.state.primary
-  //     },
-  //
-  //     accounts () {
-  //       return this.$store.getters.byType('account');
-  //     },
-  //
-  //   },
-  //
-  //   template: `
-  //     <div class="app">
-  //
-  //     <button v-on:click="poke">poke foo</button>
-  //
-  //     <hr>
-  //
-  //     <pre>
-  //     {{dump}}
-  //     </pre>
-  //
-  //       <ul id="example-1">
-  //         <li v-for="item in primary">
-  //           id: {{ JSON.stringify( item ) }}
-  //         </li>
-  //       </ul>
-  //
-  //       <hr>
-  //
-  //       <ul id="example-2">
-  //         <li v-for="item in accounts">
-  //           id: {{ JSON.stringify( item ) }}
-  //         </li>
-  //       </ul>
-  //
-  //
-  //     </div>
-  //   `
-  // })
-  //
-  //
-  //
+    template: `
+        <div class="d-none app-accounts mb-3">
 
 
 
 
 
 
-
-
-
-    const appAccounts = new Vue({
-      el: '#app-accounts',
-      // provide the store using the "store" option.
-      // this will inject the store instance to all child components.
-      store,
-
-      methods: {
-
-        isActive (account) {
-          return ( this.$store.state.local.selected.account === account._id)?"active":"";
-        },
-
-        selectAccount (account) {
-          store.commit('deselect', ['mailbox', 'messages', 'message']);
-          store.commit('select', {type:'account', id:account._id});
-        },
-      },
-
-      computed: {
-
-        accounts () {
-          return this.$store.getters.byType('account');
-        },
-
-      },
-
-      template: `
-        <div class="app-accounts mb-3">
           <div class="card">
 
-            <div class="card-header">
-              Accounts
-            </div>
 
             <ul class="list-group list-group-flush">
               <li v-for="account in accounts" class="list-group-item p-0" v-bind:class="isActive(account)">
               <div v-on:click="selectAccount(account)" class="p-3">
-              <h6>{{account.name}}</h6>
+              <small>{{account.name}}</small><br>
               <small>{{account.address}}</small>
               </div>
               </li>
@@ -396,91 +69,230 @@ const multiprocessStorePlugin = function(store){
           </div>
         </div>
       `
-    });
+  });
 
+  const appMailboxes = new Vue({
+    el: '#app-mailboxes',
+    store,
 
-    const appMailboxes = new Vue({
-      el: '#app-mailboxes',
-      // provide the store using the "store" option.
-      // this will inject the store instance to all child components.
-      store,
+    methods: {
 
-      methods: {
+      isActive(mailbox, active = "active", inactive = "") {
+        return (this.$store.state.local.selected.mailbox === mailbox._id) ? active : inactive;
+      },
 
-        isActive (mailbox) {
-
-          return ( this.$store.state.local.selected.mailbox === mailbox._id)?"active":"";
-        },
-
-        // init () {
-        //   console.log('INIT',this.mailboxes.length)
-        //   if(this.mailboxes.length > 0){
-        //     this.selectMailbox(this.mailboxes[0])
-        //   }
+      // init () {
+      //   console.log('INIT',this.mailboxes.length)
+      //   if(this.mailboxes.length > 0){
+      //     this.selectMailbox(this.mailboxes[0])
+      //   }
       //  },
 
-        selectMailbox (mailbox) {
-          store.commit('deselect', ['messages', 'message']);
-          store.commit('select', {type:'mailbox', id:mailbox._id});
-        },
+      selectMailbox(mailbox) {
+        this.$store.commit('deselect', ['smartbox', 'messages', 'message']);
+        this.$store.commit('select', {
+          type: 'mailbox',
+          id: mailbox._id
+        });
       },
 
-      computed: {
+      messageCount(mailbox) {
+        //const id = this.$store.getters.byType('mailbox').filter(mailbox=>mailbox.pid === mailbox._id);
 
-        mailboxes () {
-          return this.$store.getters.byType('mailbox').filter(mailbox=>mailbox.pid === this.$store.state.local.selected.account);
-        },
-
+        return this.$store.getters.byType('message').filter(message => message.pid === mailbox._id).length;
       },
 
-      template: `
+      logout() {
+        this.$store.commit('deselect', ['account', 'mailbox', 'smartbox', 'messages', 'message']);
+      },
+
+    },
+
+    computed: {
+
+      selectedAccountAddress() {
+        const account = (this.$store.getters.byType('account').filter(account => account._id === this.$store.state.local.selected.account)[0] || {});
+        let address = account.address;
+        if(address && address.length > 16){
+          address = address.substr(0,15) + '...';
+        }
+        return address;
+      },
+
+
+      showMore() {
+        return this.$store.state.local.more.mailboxes;
+      },
+
+      mailboxes() {
+        return this.$store.getters.byType('mailbox').filter(mailbox => mailbox.pid === this.$store.state.local.selected.account);
+      },
+
+
+
+
+    },
+
+    template: `
         <div class="app-mailboxes mb-3">
 
-          <div v-if="mailboxes" class="card">
-            <ul class="list-group list-group-flush">
-              <li v-for="mailbox in mailboxes" class="list-group-item" v-bind:class="isActive(mailbox)">
+        <div class="mb-3 clearfix">
 
-              <div v-on:click="selectMailbox(mailbox)" class="p-3">
-              <h5>{{mailbox.name}}</h5>
-              <small>{{mailbox.description}}</small>
-              </div>
+        <button v-on:click.prevent="logout()" type="button" class="btn btn-outline-secondary btn-sm float-left"><i class="fa fa-sign-out fa-flip-horizontal"></i></button>
 
-              </li>
-            </ul>
+        <div class="dropdown float-right">
+          <button class="btn btn-outline-secondary btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {{selectedAccountAddress}}
+            <i class="fa fa-cog"></i>
+          </button>
+
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#"><i class="fa fa-support text-muted"></i> Support</a>
+            <div class="dropdown-divider"></div>
+            <a v-on:click.prevent="logout()" class="dropdown-item" href="#"><i class="fa fa-sign-out text-muted"></i> Logout</a>
           </div>
         </div>
+
+        </div>
+
+        <div class="mb-3">
+
+        <hr>
+
+        </div>
+
+
+        <div v-if="showMore" class="d-none card">
+          <ul class="list-group list-group-flush">
+            <li v-for="mailbox in mailboxes" class="list-group-item" v-bind:class="isActive(mailbox)">
+
+            <div v-on:click="selectMailbox(mailbox)" class="p-3">
+            <h5>{{mailbox.name}} - {{messageCount(mailbox)}}</h5>
+            <small>{{mailbox.description}}</small>
+            </div>
+
+            </li>
+          </ul>
+        </div>
+
+        <ul v-if="!showMore" class="nav nav-pills flex-column">
+          <li  v-for="mailbox in mailboxes" class="nav-item hoverable">
+            <a class="nav-link" v-bind:class="isActive(mailbox)" v-on:click.prevent="selectMailbox(mailbox)" href="" v-bind:title="mailbox.description">{{mailbox.name}} <span class="badge pull-right px-2 my-1" v-bind:class="isActive(mailbox, 'badge-dark', 'badge-info')">{{messageCount(mailbox)}}</span> </a>
+          </li>
+        </ul>
+
+        </div>
       `
-    });
+  });
+
+  const appSmartboxes = new Vue({
+    el: '#app-smartboxes',
+    store,
+
+    methods: {
+
+      isActive(smartbox, active = "active", inactive = "") {
+        return (this.$store.state.local.selected.smartbox === smartbox.name) ? active : inactive;
+      },
+
+      selectSmartbox(smartbox) {
+        this.$store.commit('deselect', ['mailbox', 'smartbox', 'messages', 'message']);
+        this.$store.commit('select', {
+          type: 'smartbox',
+          id: smartbox.name
+        });
+      },
+
+      messageCount(smartbox) {
+        return this.$store.getters
+          .byType('message')
+          .filter(message => message.tags)
+          .filter(message => message.tags.indexOf(smartbox.name) !== -1).length;
+      },
+
+    },
+
+    computed: {
+      selectedAccountAddress() {
+        const account = (this.$store.getters.byType('account').filter(account => account._id === this.$store.state.local.selected.account)[0] || {});
+        return account.address;
+      },
+
+      smartboxes() {
+        const smartboxes = [];
+        this.$store.getters.byType('mailbox').filter(mailbox => mailbox.pid === this.$store.state.local.selected.account).forEach(mailbox => {
+          this.$store.getters.byType('message').filter(message => message.pid === mailbox._id).forEach(message => {
+            //console.log(message)
+            if (message.tags) message.tags.map(tag => {
+
+                let exists = smartboxes.filter(i => i.name == tag).length;
+                //console.log(tag, exists)
+                if (!exists) smartboxes.push({
+                    name: tag
+                  })
+
+              })
+          })
+        })
+        return smartboxes;
+      },
+
+      showMore() {
+        return this.$store.state.local.more.mailboxes;
+      },
+
+    },
+
+    template: `
+        <div class="app-mailboxes mb-3">
+
+        <ul class="nav nav-pills flex-column">
+          <li  v-for="smartbox in smartboxes" class="nav-item hoverable">
+            <a class="nav-link" v-bind:class="isActive(smartbox)" v-on:click.prevent="selectSmartbox(smartbox)" href="" v-bind:title="smartbox.description">{{smartbox.name}} <span class="badge pull-right px-2 my-1" v-bind:class="isActive(smartbox, 'badge-dark', 'badge-info')">{{messageCount(smartbox)}}</span> </a>
+          </li>
+        </ul>
+
+        </div>
+      `
+  });
 
 
-    const appMessages = new Vue({
-      el: '#app-messages',
-      // provide the store using the "store" option.
-      // this will inject the store instance to all child components.
-      store,
+  const appMessages = new Vue({
+    el: '#app-messages',
+    store,
 
-      methods: {
+    methods: {
 
-        isActive (message) {
+      isActive(message) {
 
-          return ( this.$store.state.local.selected.message === message._id)?"active":"";
-        },
+        return (this.$store.state.local.selected.message === message._id) ? "active" : "";
+      },
 
-        selectMessage (message) {
-          store.commit('select', {type:'message', id:message._id});
-        },
+      selectMessage(message) {
+        this.$store.commit('select', {
+          type: 'message',
+          id: message._id
+        });
+      },
+
+    },
+
+    computed: {
+
+      messages() {
+        const response = [];
+
+        this.$store.getters.byType('message').filter(message => message.pid === this.$store.state.local.selected.mailbox).forEach(i => response.push(i))
+        this.$store.getters.byType('message').filter(message => message.tags)
+          //.map(i=>{ console.log(this.$store.state.local.selected.smartbox, i.tags, i.tags.indexOf(this.$store.state.local.selected.smartbox)); return i })
+          .filter(message => message.tags.indexOf(this.$store.state.local.selected.smartbox) !== -1).forEach(i => response.push(i))
+        return response;
 
       },
 
-      computed: {
+    },
 
-        messages () {
-          return this.$store.getters.byType('message').filter(message=>message.pid === this.$store.state.local.selected.mailbox);
-        },
-
-      },
-
-      template: `
+    template: `
         <div class="app-messages mb-3">
 
           <div v-if="messages" class="card">
@@ -488,8 +300,8 @@ const multiprocessStorePlugin = function(store){
               <li v-for="message in messages" class="list-group-item" v-bind:class="isActive(message)">
 
               <div v-on:click="selectMessage(message)" class="p-3">
-              <h6>{{message.name}}</h6>
-              <small>{{message.text}}</small>
+                <h6>{{message.name}}</h6>
+                <small>{{message.text}}</small>
               </div>
 
               </li>
@@ -498,64 +310,91 @@ const multiprocessStorePlugin = function(store){
 
         </div>
       `
-    });
+  });
 
 
 
-    const appMessage = new Vue({
-      el: '#app-message',
-      // provide the store using the "store" option.
-      // this will inject the store instance to all child components.
-      store,
+  const appMessage = new Vue({
+    el: '#app-message',
+    store,
 
-      components: {
+    components: {
 
-        'terminal': require('./message-components/terminal/index.js'),
+      'terminal': require('./message-components/terminal/index.js'),
 
-        'adduser': require('./message-components/adduser/index.js'),
-        'deluser': require('./message-components/deluser/index.js'),
+      'adduser': require('./message-components/adduser/index.js'),
+      'deluser': require('./message-components/deluser/index.js'),
 
-        'addbox': require('./message-components/addbox/index.js'),
+      'addbox': require('./message-components/addbox/index.js'),
+      'sendmail': require('./message-components/sendmail/index.js'),
 
+    },
+
+    data: {
+      form: {
+
+      }
+    },
+
+    methods: {
+
+      negative(message) {},
+
+      positive(message) {},
+
+      selectMessage(message) {
+        this.$store.commit('select', {
+          type: 'message',
+          id: message._id
+        });
+      },
+    },
+
+    computed: {
+
+      messageIcon() {
+        return `fa fa-${this.message.icon || 'envelope-open-o'} fa-2x`;
+      },
+      message() {
+        return this.$store.getters.byType('message').filter(message => message._id === this.$store.state.local.selected.message)[0];
       },
 
-      data: {
-        form:{
+    },
 
-        }
-      },
-
-      methods: {
-
-        negative (message) {
-
-        },
-
-        positive (message) {
-
-        },
-
-        selectMessage (message) {
-          store.commit('select', {type:'message', id:message._id});
-        },
-      },
-
-      computed: {
-
-        message () {
-          return this.$store.getters.byType('message').filter(message=>message._id === this.$store.state.local.selected.message)[0];
-        },
-
-      },
-
-      template: `
+    template: `
         <div class="app-message mb-3">
 
           <div v-if="message" class="card">
+
             <div class="card-body">
-              <h5 class="card-title">{{message.name}}</h5>
-              <h6 class="card-subtitle mb-2 text-muted mb-3"><small>from:</small> {{message.from}}</h6>
+
+            <div class="container-fluid">
+              <div class="row">
+              <div class="col-4">
+              <h4 class="my-3 text-right">
+              <span class="py-2 mb-3 d-inline-block">
+              <i v-bind:class="messageIcon"></i>
+              </span>
+              </h4>
+              </div>
+              <div class="col-8">
+              <h4 class="my-3 pt-3">
+               {{message.name}}
+              </h4>
+              </div>
+              </div>
+            </div>
+
+
+
+
+
+
+
+              <h6 v-if="message.from" class="card-subtitle  pb-3 text-muted mb-3"><small>from:</small> {{message.from}}</h6>
+
               <p class="card-text">{{message.text}}</p>
+
             </div>
 
             <div v-if="message.negative||message.positive" class="card-body">
@@ -569,6 +408,7 @@ const multiprocessStorePlugin = function(store){
             <adduser v-if="message.component === 'adduser'"></adduser>
             <deluser v-if="message.component === 'deluser'"></deluser>
             <addbox v-if="message.component === 'addbox'"></addbox>
+            <sendmail v-if="message.component === 'sendmail'"></sendmail>
             </div>
 
 
@@ -577,11 +417,216 @@ const multiprocessStorePlugin = function(store){
 
         </div>
       `
-    });
+  });
+
+
+
+
+
+
+
+
+
+  const appIdentity = new Vue({
+    el: '#app-identity',
+    store,
+    data: {
+
+
+      user: "alice@aol.com",
+
+    },
+
+    methods: {
+
+      login() {
+
+        const account = this.$store.getters.byType('account').filter(account => account.address === this.user)[0];
+        this.$store.commit('select', {
+          type: 'account',
+          id: account._id
+        });
+
+      },
+
+    },
+
+    computed: {
+
+      display() {
+        return !(this.$store.state.local.selected.account)
+      },
+
+      showPassword() {
+        const account = this.$store.getters.byType('account').filter(account => account.address === this.user);
+        if ((account.length === 1) && (account.password)) {
+          return true;
+        }
+      },
+
+      showLoginButton() {
+        const account = this.$store.getters.byType('account').filter(account => account.address === this.user);
+        if ((account.length === 1) && (!account.password)) {
+          return true;
+        }
+      },
+
+      userHelp() {
+        const account = this.$store.getters.byType('account').filter(account => account.address === this.user);
+
+        if (account.length === 1) {
+          return "";
+        } else {
+          if (this.user) {
+            return `User "${this.user}" Not found.`
+          }
+        }
+
+      },
+      accounts() {
+        return this.$store.getters.byType('account'); //
+      },
+
+    },
+
+    template: `
+            <div class="app-identity bg-dark" v-bind:class="{'d-none':!display}" style="padding:0; margin:0; position: fixed; top:0; left:0; right:0; bottom:0;">
+
+
+            <div class="card text-white bg-dark mb-3" style="margin: 15% 30%; max-width: 30rem;">
+              <div class="card-header"><i class="fa fa-terminal"></i> System Login</div>
+              <div class="card-body">
+
+                <form>
+
+                <div class="input-group">
+                <div class="input-group-btn">
+                  <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-user"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    <a v-for="account in accounts" class="dropdown-item" v-on:click="user=account.address" href="#">{{account.address}}</a>
+                  </div>
+                </div>
+
+                  <input type="text" class="form-control" v-model="user" id="user" aria-label="Text input with dropdown button">
+
+
+                </div>
+                <small class="form-text text-muted d-inline-block mb-3 mt-2">{{userHelp}}</small>
+
+
+                  <div class="form-group d-none">
+
+                    <label for="user">User</label>
+                    <input type="email" class="form-control" v-model="user" id="user" aria-describedby="emailHelp" placeholder="">
+                    <small id="userHelp" class="form-text text-muted">{{userHelp}}</small>
+
+                  </div>
+
+                  <transition name="slide-fade">
+
+                  <div v-if="showPassword" class="form-group">
+                    <label for="exampleInputPassword1">Password</label>
+                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="">
+                  </div>
+                  </transition>
+
+                  <transition name="slide-fade">
+
+                  <div class="form-group">
+                  <button v-if="showLoginButton" type="button" v-on:click="login" class="btn btn-warning float-right"><i class="fa fa-sign-in"></i> Login</button>
+                  </div>
+
+                  </transition>
+
+
+                </form>
+
+              </div>
+            </div>
+
+
+
+
+            </div>
+          `
+  });
+
+
+  const appRecorded = new Vue({
+    el: '#app-recorded',
+    store,
+    data: {
+
+
+
+    },
+
+    methods: {
+
+      save() {
+
+
+      },
+
+    },
+
+    computed: {
+
+      display() {
+        return !(this.$store.state.local.selected.account)
+      },
+
+
+
+
+
+
+    },
+
+    template: `
+            <div class="d-none app-recorded bg-dark" style="padding:0; margin:0; position: fixed; top:0; left:0; right:0; bottom:0;">
+
+<textarea class="bg-dark text-white border-0" style="padding:1rem; margin:0; position: fixed; top:0; left:0; right:0; bottom:0; width:100%">
+{
+  "_id": "account-administrator-address-book",
+  "pid": "account-administrator",
+  "type": "mailbox",
+  "name": "Address Book",
+  "description": "Address Book for administrator@example.com"
+}
+</textarea>
+
+
+            <div class="card text-white bg-dark mb-3" style="padding:0; margin:1rem; position: fixed; bottom:0; right:0;">
+              <div class="card-block p-1">
+
+                <div class="btn-group dropup">
+                  <button  v-on:click="save" type="button" class="btn btn-warning"><i class="fa fa-save"></i> Save</button>
+                  <button type="button" class="btn btn-warning dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="sr-only">Toggle Dropdown</span>
+                  </button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Previous Version</a>
+                    <a class="dropdown-item" href="#">Next Version</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">Exit Editor</a>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            </div>
+          `
+  });
+
+
+
 
 } // main // /////////////////////////////////////////////////////////////////
 
 main({
-  // name of primary store
   primaryStore: 'primary',
 });

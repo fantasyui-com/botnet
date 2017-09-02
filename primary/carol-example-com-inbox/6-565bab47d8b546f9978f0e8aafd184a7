@@ -1,8 +1,0 @@
-{
-  "_id": "carol-example-com-inbox",
-  "pid": "carol-example-com",
-  "type": "mailbox",
-  "name": "Inbox",
-  "description": "Inbox for carol@example.com",
-  "_rev": "6-565bab47d8b546f9978f0e8aafd184a7"
-}

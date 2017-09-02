@@ -1,9 +1,0 @@
-{
-  "_id": "manager-local-tasks-hello",
-  "pid": "manager-local-tasks",
-  "type": "message",
-  "from": "administrator@local",
-  "name": "Welcome",
-  "deleted": false,
-  "text": "Hey manager@local, we just created your new box."
-}

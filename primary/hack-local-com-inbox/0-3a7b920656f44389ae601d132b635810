@@ -1,7 +1,0 @@
-{
-  "_id": "hack-local-com-inbox",
-  "pid": "hack-local-com",
-  "type": "mailbox",
-  "name": "Inbox",
-  "description": "Inbox for hack@local.com"
-}

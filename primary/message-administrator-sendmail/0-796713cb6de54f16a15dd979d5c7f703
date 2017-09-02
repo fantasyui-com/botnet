@@ -1,0 +1,17 @@
+{
+  "_id": "message-administrator-sendmail",
+  "pid":"account-administrator-inbox",
+  "type": "message",
+  "from": "bot@local",
+  "icon": "mail",
+  "name": "Send Mail",
+  "deleted": false,
+
+  "tags":["Tools"],
+
+  "text": "Send mail to other users.",
+
+  "component": "sendmail"
+
+
+}

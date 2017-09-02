@@ -1,8 +1,0 @@
-{
-  "_id": "vader-att",
-  "type": "account",
-  "name": "Vader",
-  "address": "vader@att",
-  "_rev": "1-cd80fc2ae41e42efbedbc393d06ea116",
-  "deleted": true
-}

@@ -5,9 +5,25 @@ html {
 }
 
 body {
-
+  padding: 0;
+  margin: 0;
   overflow: hidden;
 }
+
+/* Enter and leave animations can use different */
+/* durations and timing functions.              */
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+  transform: translateX(10px);
+  opacity: 0;
+}
+
 
 
 .pane.pane-main {
@@ -86,16 +102,16 @@ body {
 }
 
 
-@media all and (min-width: 800px) {
+@media all and (max-width: 999px) and (min-width: 800px) {
 
   .pane.pane-main {
     left:0;
-    right: 70%;
+    right: 75%;
   }
 
 
   .pane.pane-list {
-    left:30%;
+    left:25%;
     right:40%;
   }
 
@@ -105,4 +121,31 @@ body {
     right: 0;
   }
 
+}
+
+@media all and (min-width: 1000px) {
+
+  .pane.pane-main {
+    left:0;
+    right: 80%;
+  }
+
+
+  .pane.pane-list {
+    left:20%;
+    right:50%;
+  }
+
+
+  .pane.pane-data {
+    left:50%;
+    right: 0;
+  }
+
+}
+
+
+
+.hoverable:hover {
+  background-color: rgb(248, 249, 250)!important;
 }

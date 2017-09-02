@@ -1,7 +1,0 @@
-{
-  "_id": "vader-att-inbox",
-  "pid": "vader-att",
-  "type": "mailbox",
-  "name": "Inbox",
-  "description": "Inbox for vader@att"
-}

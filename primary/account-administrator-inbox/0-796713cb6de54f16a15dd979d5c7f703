@@ -3,5 +3,5 @@
   "pid":"account-administrator",
   "type": "mailbox",
   "name": "Inbox",
-  "description": "Inbox for administrator@example.com"
+  "description": "Tools for system management."
 }
