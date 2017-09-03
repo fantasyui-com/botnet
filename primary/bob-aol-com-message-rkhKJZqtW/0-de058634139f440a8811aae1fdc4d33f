@@ -1,0 +1,11 @@
+{
+  "_id": "bob-aol-com-message-rkhKJZqtW",
+  "pid": "bob-aol-com-inbox",
+  "type": "message",
+  "timestamp": "Sun Sep 03 2017 18:17:40 GMT-0400 (EDT)",
+  "from": "alice@aol.com",
+  "name": "Hey Bob.",
+  "tags": [],
+  "deleted": false,
+  "text": "You're one 'o' away from being a Boob."
+}

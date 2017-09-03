@@ -10,6 +10,8 @@ const EventEmitter = require('events');
 class MyEmitter extends EventEmitter {}
 const emitter = new MyEmitter();
 
+const bcrypt = require('bcryptjs');
+
 $(function() {
   $('title').text(pkg.productName || pkg.name);
 });
@@ -379,6 +381,7 @@ async function main(options) {
             <div class="card-body">
               <h4 class="text-left py-2 mb-3"> <i v-bind:class="messageIcon"></i> {{message.name}} </h4>
               <h6 v-if="message.from" class="card-subtitle pb-2 text-muted"><small>from:</small> {{message.from}}</h6>
+              <h6 v-if="message.timestamp" class="card-subtitle pb-2 text-muted small"> {{message.timestamp}}</h6>
               <h6 v-if="message.tags" class="card-subtitle pb-2 text-fade"> <span class="badge badge-light mr-1" v-for="tag in message.tags">{{tag}}</span> </h6>
             </div>
           </div>
@@ -405,20 +408,46 @@ async function main(options) {
     el: '#app-identity',
     store,
     data: {
-
+      name: "",
 
       user: "alice@aol.com",
+      password: "",
 
+      passwordHelp: "",
     },
 
     methods: {
 
       login() {
+
         const account = this.$store.getters.getUserAccountByAddress(this.user);
-        this.$store.commit('select', {
-          type: 'account',
-          id: account._id
-        });
+
+        let allow = false;
+
+        if(account.password){
+
+          if(bcrypt.compareSync(this.password, account.password)){
+            allow = true;
+          }else{
+            allow = false;
+            this.passwordHelp = "Bad Password"
+          }
+
+        }else{
+          allow = true;
+        }
+
+
+        if(allow){
+
+          this.$store.commit('select', {
+            type: 'account',
+            id: account._id
+          });
+
+        }else{
+          // nope
+        }
 
       },
 
@@ -453,12 +482,16 @@ async function main(options) {
         }
       },
 
+
       userHelp() {
         const account = this.$store.getters.getUserAccountByAddress(this.user);
         if ( account ) {
+          this.name = account.name;
           // account found, no helptext is needed.
+          return `Welcome back ${account.name}.`
           return "";
         } else {
+          this.name = "";
           // account was not found
           if (this.user) {
             // but something was typed in
@@ -522,8 +555,9 @@ async function main(options) {
                   <transition name="slide-fade">
 
                   <div v-if="showPassword" class="form-group">
-                    <label for="exampleInputPassword1">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="">
+                    <label for="password">Password</label>
+                    <input v-model="password" type="password" class="form-control" id="password" placeholder="">
+                    <small id="passwordHelp" class="form-text text-muted">{{passwordHelp}}</small>
                   </div>
                   </transition>
 

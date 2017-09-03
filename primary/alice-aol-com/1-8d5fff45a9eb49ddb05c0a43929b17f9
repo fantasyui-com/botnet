@@ -1,0 +1,8 @@
+{
+  "_id": "alice-aol-com",
+  "type": "account",
+  "name": "Alice",
+  "address": "alice@aol.com",
+  "_rev": "1-8d5fff45a9eb49ddb05c0a43929b17f9",
+  "timestamp": "Sun Sep 03 2017 18:00:50 GMT-0400 (EDT)"
+}

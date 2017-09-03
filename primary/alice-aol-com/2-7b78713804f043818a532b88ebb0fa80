@@ -1,0 +1,9 @@
+{
+  "_id": "alice-aol-com",
+  "type": "account",
+  "name": "Alice Smith",
+  "address": "alice@aol.com",
+  "_rev": "2-7b78713804f043818a532b88ebb0fa80",
+  "timestamp": "Sun Sep 03 2017 18:03:46 GMT-0400 (EDT)",
+  "password": "$2a$10$45nsulb7SzqFO6m8z9wSlOpWjkYkfxCEkO0J4mBh26zw5E.FBOF7W"
+}

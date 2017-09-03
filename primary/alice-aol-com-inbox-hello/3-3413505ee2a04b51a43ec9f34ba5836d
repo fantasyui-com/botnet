@@ -1,0 +1,11 @@
+{
+  "_id": "alice-aol-com-inbox-hello",
+  "pid": "alice-aol-com-inbox",
+  "type": "message",
+  "from": "administrator@local",
+  "name": "Welcome",
+  "deleted": false,
+  "text": "Welcome to the system alice@aol.com",
+  "_rev": "3-3413505ee2a04b51a43ec9f34ba5836d",
+  "timestamp": "Sun Sep 03 2017 18:03:46 GMT-0400 (EDT)"
+}

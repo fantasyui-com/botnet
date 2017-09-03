@@ -175,11 +175,13 @@ module.exports = async function(options){
 
     actions: {
 
-      async adduser({commit, state, getters}, {name, address}) {
+      async adduser({commit, state, getters}, {name, address, password}) {
 
         await multiprocessStore.upsertObject({
           _id: kebabCase(address),
           type: 'account',
+          timestamp: (new Date()).toString(),
+          password,
           name,
           address
         });
@@ -188,6 +190,7 @@ module.exports = async function(options){
           _id: kebabCase(address + '-inbox'),
           pid: kebabCase(address),
           type: 'mailbox',
+          timestamp: (new Date()).toString(),
           name: 'Inbox',
           description: `Inbox for ${address}`
         });
@@ -196,6 +199,7 @@ module.exports = async function(options){
           _id: kebabCase(address + '-inbox-hello'),
           pid: kebabCase(address + '-inbox'),
           type: "message",
+          timestamp: (new Date()).toString(),
           from: "administrator@local",
           name: "Welcome",
           deleted: false,
@@ -217,6 +221,7 @@ module.exports = async function(options){
           _id: kebabCase(pid + '-' + name),
           pid,
           type: 'mailbox',
+          timestamp: (new Date()).toString(),
           name,
           description: `${name} for ${address}`
         });
@@ -225,6 +230,7 @@ module.exports = async function(options){
           _id: kebabCase(pid + '-' + name + '-hello'),
           pid: kebabCase(pid + '-' + name),
           type: "message",
+          timestamp: (new Date()).toString(),
           from: "administrator@local",
           name: "Welcome",
           deleted: false,
@@ -258,6 +264,7 @@ module.exports = async function(options){
           _id: kebabCase(userPid + '-' + 'message') + '-' + shortid.generate() ,
           pid: inboxPid,
           type: "message",
+          timestamp: (new Date()).toString(),
           from,
           name,
           tags,
@@ -282,7 +289,7 @@ module.exports = async function(options){
         store.commit('update', {
           name,
           id,
-          data: updatedData
+          data: updatedData,
         });
       },
 

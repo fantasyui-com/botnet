@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+
 module.exports = {
   data () {
     return {
@@ -5,6 +7,7 @@ module.exports = {
         type: "adduser",
         name:"",
         address:"",
+        password:"",
 
     }
   },
@@ -13,12 +16,17 @@ module.exports = {
 
       <div class="form-group">
         <label for="name">Name</label>
-        <input v-model="name" class="form-control" id="name" placeholder="Manager">
+        <input v-model="name" class="form-control" id="name" placeholder="Alice Kingsleigh">
       </div>
 
       <div class="form-group">
         <label for="address">Account Address</label>
         <input v-model="address" class="form-control" id="address" placeholder="alice@wonderland">
+      </div>
+
+      <div class="form-group">
+        <label for="address">Password</label>
+        <input type="password" v-model="password" class="form-control" id="password">
       </div>
 
       <hr>
@@ -36,14 +44,19 @@ module.exports = {
 
     submit (event) {
 
+      const salt = bcrypt.genSaltSync(10);
+      const hash = bcrypt.hashSync(this.password, salt);
+
        this.$store.dispatch({
          type: this.type,
          name: this.name,
          address: this.address,
+         password: hash,
        });
 
        this.name = "";
        this.address = "";
+       this.password = "";
 
        this.$store.commit('deselect', ['messages', 'message']);
 
@@ -53,6 +66,7 @@ module.exports = {
 
       this.name = "";
       this.address = "";
+      this.password = "";
 
       this.$store.commit('deselect', ['messages', 'message']);
     },

@@ -1,0 +1,9 @@
+{
+  "_id": "alice-aol-com-inbox",
+  "pid": "alice-aol-com",
+  "type": "mailbox",
+  "name": "Inbox",
+  "description": "Inbox for alice@aol.com",
+  "_rev": "1-96fc5ae838cc4000904f5208126f4815",
+  "timestamp": "Sun Sep 03 2017 18:00:50 GMT-0400 (EDT)"
+}

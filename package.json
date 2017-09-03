@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "chokidar": "^1.7.0",
     "lodash": "^4.17.4",
     "multiprocess-store": "^1.1.7",
