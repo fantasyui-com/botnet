@@ -128,7 +128,7 @@ async function main(options) {
 
     methods: {
 
-      isActive(smartbox, active = "bg-info text-white", inactive = "text-muted") {
+      isActive(smartbox, active = "bg-info text-white", inactive = "text-dark") {
         // TODO IS ACTIVE API CLEANUP
         return (this.$store.state.local.selected.smartbox === smartbox._id) ? active : inactive;
       },
@@ -176,7 +176,9 @@ async function main(options) {
     },
 
     template: `
-        <div class="app-mailboxes mb-3">
+        <div class="app-mailboxes py-3">
+
+        <h6 class="text-muted">Mailboxes</h6>
 
         <div v-if="showMore" class="d-none card">
           <ul class="list-group list-group-flush">
@@ -193,7 +195,7 @@ async function main(options) {
 
         <ul v-if="!showMore" class="nav nav-pills flex-column">
           <li  v-for="mailbox in mailboxes" class="nav-item hoverable">
-            <a class="nav-link" v-bind:class="isActive(mailbox)" v-on:click.prevent="selectMailbox(mailbox)" href="" v-bind:title="mailbox.description">{{mailbox.name}} <span class="badge pull-right px-2 my-1" v-bind:class="isActive(mailbox, 'badge-dark', 'badge-info')">{{messageCount(mailbox)}}</span> </a>
+            <a class="nav-link small" v-bind:class="isActive(mailbox)" v-on:click.prevent="selectMailbox(mailbox)" href="" v-bind:title="mailbox.description">{{mailbox.name}} <span class="badge pull-right px-2 my-1" v-bind:class="isActive(mailbox, 'badge-dark', 'badge-info')">{{messageCount(mailbox)}}</span> </a>
           </li>
         </ul>
 
@@ -207,7 +209,7 @@ async function main(options) {
 
     methods: {
 
-      isActive(smartbox, active = "bg-info text-white", inactive = "text-muted") {
+      isActive(smartbox, active = "bg-info text-white", inactive = "text-dark") {
         // TODO: Improve isSelected API
         return (this.$store.state.local.selected.smartbox === smartbox.name) ? active : inactive;
       },
@@ -244,10 +246,13 @@ async function main(options) {
     },
 
     template: `
-        <div class="app-mailboxes mb-3">
+        <div class="app-mailboxes py-3">
+
+        <h6 class="text-muted">Smartboxes</h6>
+
           <ul class="nav nav-pills flex-column">
             <li  v-for="smartbox in smartboxes" class="nav-item hoverable">
-              <a class="nav-link" v-bind:class="isActive(smartbox)" v-on:click.prevent="selectSmartbox(smartbox)" href="" v-bind:title="smartbox.description">{{smartbox.name}} <span class="badge pull-right px-2 my-1" v-bind:class="isActive(smartbox, 'badge-dark', 'badge-info')">{{messageCount(smartbox)}}</span> </a>
+              <a class="nav-link small" v-bind:class="isActive(smartbox)" v-on:click.prevent="selectSmartbox(smartbox)" href="" v-bind:title="smartbox.description">{{smartbox.name}} <span class="badge pull-right px-2 my-1" v-bind:class="isActive(smartbox, 'badge-dark', 'badge-info')">{{messageCount(smartbox)}}</span> </a>
             </li>
           </ul>
         </div>
@@ -291,6 +296,7 @@ async function main(options) {
 
     template: `
         <div class="app-messages mb-3">
+
 
           <div v-if="messages.length > 0" class="card">
             <ul class="list-group list-group-flush">
