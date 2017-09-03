@@ -1,0 +1,8 @@
+{
+  "_id": "bob-aol-com-inbox",
+  "pid": "bob-aol-com",
+  "type": "mailbox",
+  "name": "Inbox",
+  "description": "Inbox for bob@aol.com",
+  "_rev": "1-2b5715e61326445bb49436ca5ac7a5c9"
+}

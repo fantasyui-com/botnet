@@ -1,0 +1,14 @@
+{
+  "_id": "bob-aol-com-message-HyU2J3Ktb",
+  "pid": "bob-aol-com-inbox",
+  "type": "message",
+  "from": "alice@aol.com",
+  "name": "Hey hey!!!",
+  "tags": [
+    "VIP"
+  ],
+  "deleted": true,
+  "text": "What is going on?",
+  "component": "",
+  "_rev": "1-19f9791a997447e5a8b143d5d725e072"
+}

@@ -3,7 +3,7 @@
   "pid":"account-administrator-inbox",
   "type": "message",
   "from": "bot@local",
-  "name": "Delete User Account Form",
+  "name": "Delete User",
   "icon": "user-circle",
   "deleted": false,
 

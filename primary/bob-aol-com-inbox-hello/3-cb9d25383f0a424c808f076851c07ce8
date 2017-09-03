@@ -1,0 +1,10 @@
+{
+  "_id": "bob-aol-com-inbox-hello",
+  "pid": "bob-aol-com-inbox",
+  "type": "message",
+  "from": "administrator@local",
+  "name": "Welcome",
+  "deleted": true,
+  "text": "Hey bob@aol.com, we just created your new box.",
+  "_rev": "3-cb9d25383f0a424c808f076851c07ce8"
+}

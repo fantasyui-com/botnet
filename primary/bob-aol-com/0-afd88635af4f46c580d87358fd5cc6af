@@ -1,0 +1,6 @@
+{
+  "_id": "bob-aol-com",
+  "type": "account",
+  "name": "Bob",
+  "address": "bob@aol.com"
+}

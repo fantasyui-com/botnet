@@ -3,7 +3,7 @@
   "pid":"account-administrator-inbox",
   "type": "message",
   "from": "bot@local",
-  "name": "Add Mailbox Form",
+  "name": "Add Mailbox",
   "icon": "inbox",
 
   "deleted": false,

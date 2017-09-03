@@ -3,7 +3,7 @@
   "pid":"account-administrator-inbox",
   "type": "message",
   "from": "bot@local",
-  "name": "Add User Account Form",
+  "name": "Add User",
   "icon": "user-circle",
   "deleted": false,
 

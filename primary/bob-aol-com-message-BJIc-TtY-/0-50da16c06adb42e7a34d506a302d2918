@@ -1,0 +1,11 @@
+{
+  "_id": "bob-aol-com-message-BJIc-TtY-",
+  "pid": "bob-aol-com-inbox",
+  "type": "message",
+  "from": "administrator@example.com",
+  "name": "System Terminal",
+  "tags": ["Actions"],
+  "deleted": false,
+  "text": "Access the system via terminal.",
+  "component": "terminal"
+}

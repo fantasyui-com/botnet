@@ -1,0 +1,10 @@
+{
+  "_id": "bob-aol-com-message-Sk5jt3KFb",
+  "pid": "bob-aol-com-inbox",
+  "type": "message",
+  "from": "alice@aol.com",
+  "name": "Hello.",
+  "tags": [],
+  "deleted": false,
+  "text": "How are you?"
+}

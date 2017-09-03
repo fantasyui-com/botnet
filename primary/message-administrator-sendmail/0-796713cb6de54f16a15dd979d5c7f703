@@ -3,7 +3,7 @@
   "pid":"account-administrator-inbox",
   "type": "message",
   "from": "bot@local",
-  "icon": "mail",
+  "icon": "envelope",
   "name": "Send Mail",
   "deleted": false,
 

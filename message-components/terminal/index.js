@@ -47,9 +47,6 @@ module.exports = {
     help () {
       return !!(this.command.match(/^\?$|^Help$/i))
     },
-    accounts () {
-      return this.$store.getters.byType('account');
-    },
 
   },
 

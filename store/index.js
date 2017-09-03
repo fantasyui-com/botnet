@@ -42,7 +42,6 @@ module.exports = async function(options){
 
     },
 
-
     getters: {
 
       byType: (state, getters) => (type) => {
@@ -53,15 +52,93 @@ module.exports = async function(options){
           .filter(record => record.type === type)
       },
 
-      userAccount: (state, getters) => (id) => {
-        return getters.byType('account')
-          .filter(account => account.id === id)[0];
+      getSelectedAccount: (state, getters) => () => {
+        return getters.byType('account').filter(account => account._id === state.local.selected.account)[0];
       },
 
-      userAccountList: state => {
-        return state.accounts
-          .filter(record => record.type === 'account')
-          .filter(account => account.enabled)
+      getAllAccounts: (state, getters) => () => {
+        return getters.byType('account');
+      },
+
+      getUserAccountByAddress: (state, getters) => (address) => {
+        const list = getters.byType('account').filter(account => account.address === address);
+        if( list.length > 0 ) return list[0];
+        return null;
+      },
+
+      getSelectedMessage: (state, getters) => () => {
+        /* message has a unique ID, no filtration needed */
+        const list = getters.byType('message').filter(message => message._id === state.local.selected.message)
+        if( list.length > 0 ) return list[0];
+        return null;
+      },
+
+      getAccountMailboxes: (state, getters) => (accountId) => {
+        return getters
+        .byType('mailbox')
+        .filter(mailbox => mailbox.pid === accountId)
+      },
+
+      getAccountMailboxByName: (state, getters) => (accountId, mailboxName) => {
+        const list = getters.getAccountMailboxes(accountId)
+        .filter(mailbox => mailbox.name === mailboxName);
+        if( list.length > 0 ) return list[0];
+        return null;
+      },
+
+      getSelectedAccountMailboxes: (state, getters) => () => {
+        return getters.getAccountMailboxes(state.local.selected.account);
+      },
+
+      getAccountMessages: (state, getters) => (accountId) => {
+        const list = [];
+        getters.getAccountMailboxes(accountId).forEach(mailbox => {
+
+          getters.byType('message')
+          .filter(message => message.pid === mailbox._id)
+          .forEach(message => {
+            list.push(message);
+          })
+
+        })
+        return list;
+      },
+
+      getMessagesForMailbox: (state, getters) => (mailboxId) => {
+        const list = getters.getAccountMessages(state.local.selected.account).filter(message => message.pid === mailboxId)
+        return list;
+      },
+
+      getMessagesForSelectedMailbox: (state, getters) => () => {
+        const list = getters.getMessagesForMailbox(state.local.selected.mailbox);
+        return list;
+      },
+
+      getMessagesForSelectedSmartbox: (state, getters) => () => {
+        const list = getters.getAccountMessages(state.local.selected.account)
+        .filter(message => message.tags !== undefined)
+        .filter(message => message.tags.indexOf(state.local.selected.smartbox) !== -1)
+        return list;
+      },
+
+      getSmartboxes: (state, getters) => () => {
+        const list = [];
+        getters.getAccountMessages(state.local.selected.account).forEach(message => {
+          if (message.tags) message.tags.map(tag => {
+            let exists = list.filter(i => i.name == tag).length;
+            if (!exists) list.push({
+              name: tag
+            })
+          })
+        })
+        return list;
+      },
+
+      getSmartboxMessagesForSmartbox: (state, getters) => (smartbox) => {
+        const list = getters.getAccountMessages(state.local.selected.account)
+        .filter(message => message.tags !== undefined)
+        .filter(message => message.tags.indexOf(smartbox.name) !== -1)
+        return list;
       },
 
     },
@@ -98,7 +175,7 @@ module.exports = async function(options){
 
     actions: {
 
-      async adduser({commit, state}, {name, address}) {
+      async adduser({commit, state, getters}, {name, address}) {
 
         await multiprocessStore.upsertObject({
           _id: kebabCase(address),
@@ -127,15 +204,12 @@ module.exports = async function(options){
 
       },
 
-      async deluser({commit, state}, {id}) {
+      async deluser({commit, state, getters}, {id}) {
         let existingData = await multiprocessStore.getObject(id);
-        await multiprocessStore.updateObject(Object.assign(existingData, {
-          deleted: true
-        }));
+        await multiprocessStore.updateObject(Object.assign(existingData, { deleted: true }));
       },
 
-
-      async addbox({commit, state}, {name, pid}) {
+      async addbox({commit, state, getters}, {name, pid}) {
 
         const {address} = await multiprocessStore.getObject(pid);
 
@@ -159,45 +233,49 @@ module.exports = async function(options){
 
       },
 
+      async sendmail({ commit, state, getters }, { from, address, box, name, text, component }) {
 
-      async sendmail({ commit, state }, { from, address, box, name, text, component }) {
+        console.info({ from, address, box, name, text, component })
 
-        const account = this.getters.byType('account').filter(account => account.address === address);
-        const userPid = (account[0]||{})._id;
+        const account = getters.getUserAccountByAddress(address);
+        if(!account) return;
 
-        const inbox =  this.getters.byType('mailbox').filter(mailbox => mailbox.pid === userPid).filter(mailbox => mailbox.name === 'Inbox');
-        const inboxPid = (inbox[0]||{})._id;
+        const inbox = getters.getAccountMailboxByName(account._id, 'Inbox')
+        if(!inbox) return;
+
+        const userPid = account._id;
+        const inboxPid = inbox._id;
+
+        const tags = [];
+
+        if(box) {
+          const split = box.split(",").map(i=>i.trim()).filter(i=>i);
+          split.forEach(i=>tags.push(i))
+
+        }
 
         await multiprocessStore.upsertObject({
-          _id: kebabCase(account._id + '-' + 'message') + '-' + shortid.generate() ,
+          _id: kebabCase(userPid + '-' + 'message') + '-' + shortid.generate() ,
           pid: inboxPid,
           type: "message",
-
           from,
           name,
-          tags: box.split(",").map(i=>i.trim()),
+          tags,
           deleted: false,
           text,
           component,
         });
 
-        //
-        // if(!mailbox){
-        //
-        // }
-        //
-        // {
-        //   "_id": "alice-aol-com-inbox",
-        //   "pid": "alice-aol-com",
-        //   "type": "mailbox",
-        //   "name": "Inbox",
-        //   "description": "Inbox for alice@aol.com"
-        // }
-
-
       },
 
-      async poke({commit, state}, {name, id, data}) {
+      async delete({ commit, state, getters }, { id }) {
+        await multiprocessStore.upsertObject({
+          _id: id,
+          deleted: true,
+        });
+      },
+
+      async poke({commit, state, getters}, {name, id, data}) {
         let existingData = await multiprocessStore.getObject(id);
         await multiprocessStore.updateObject(Object.assign(existingData, data));
         let updatedData = await multiprocessStore.getObject(id);
@@ -206,7 +284,6 @@ module.exports = async function(options){
           id,
           data: updatedData
         });
-
       },
 
     }

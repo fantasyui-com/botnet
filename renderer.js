@@ -19,16 +19,13 @@ async function main(options) {
 
   const store = await require(__dirname + '/store/index.js')(options);
 
-
   const appAccounts = new Vue({
     el: '#app-accounts',
     store,
     methods: {
-
       isActive(account) {
         return (this.$store.state.local.selected.account === account._id) ? "active" : "";
       },
-
       selectAccount(account) {
         this.$store.commit('deselect', ['mailbox', 'smartbox', 'messages', 'message']);
         this.$store.commit('select', {
@@ -37,26 +34,14 @@ async function main(options) {
         });
       },
     },
-
     computed: {
-
       accounts() {
-        return this.$store.getters.byType('account');
+        return this.$store.getters.getAllAccounts();
       },
-
     },
-
     template: `
         <div class="d-none app-accounts mb-3">
-
-
-
-
-
-
           <div class="card">
-
-
             <ul class="list-group list-group-flush">
               <li v-for="account in accounts" class="list-group-item p-0" v-bind:class="isActive(account)">
               <div v-on:click="selectAccount(account)" class="p-3">
@@ -65,42 +50,16 @@ async function main(options) {
               </div>
               </li>
             </ul>
-
           </div>
         </div>
       `
   });
 
-  const appMailboxes = new Vue({
-    el: '#app-mailboxes',
+  const appUser = new Vue({
+    el: '#app-user',
     store,
 
     methods: {
-
-      isActive(mailbox, active = "active", inactive = "") {
-        return (this.$store.state.local.selected.mailbox === mailbox._id) ? active : inactive;
-      },
-
-      // init () {
-      //   console.log('INIT',this.mailboxes.length)
-      //   if(this.mailboxes.length > 0){
-      //     this.selectMailbox(this.mailboxes[0])
-      //   }
-      //  },
-
-      selectMailbox(mailbox) {
-        this.$store.commit('deselect', ['smartbox', 'messages', 'message']);
-        this.$store.commit('select', {
-          type: 'mailbox',
-          id: mailbox._id
-        });
-      },
-
-      messageCount(mailbox) {
-        //const id = this.$store.getters.byType('mailbox').filter(mailbox=>mailbox.pid === mailbox._id);
-
-        return this.$store.getters.byType('message').filter(message => message.pid === mailbox._id).length;
-      },
 
       logout() {
         this.$store.commit('deselect', ['account', 'mailbox', 'smartbox', 'messages', 'message']);
@@ -111,7 +70,7 @@ async function main(options) {
     computed: {
 
       selectedAccountAddress() {
-        const account = (this.$store.getters.byType('account').filter(account => account._id === this.$store.state.local.selected.account)[0] || {});
+        const account = (this.$store.getters.getSelectedAccount()||{});
         let address = account.address;
         if(address && address.length > 16){
           address = address.substr(0,15) + '...';
@@ -119,14 +78,11 @@ async function main(options) {
         return address;
       },
 
-
       showMore() {
         return this.$store.state.local.more.mailboxes;
       },
 
-      mailboxes() {
-        return this.$store.getters.byType('mailbox').filter(mailbox => mailbox.pid === this.$store.state.local.selected.account);
-      },
+
 
 
 
@@ -162,6 +118,66 @@ async function main(options) {
         </div>
 
 
+        </div>
+      `
+  });
+
+  const appMailboxes = new Vue({
+    el: '#app-mailboxes',
+    store,
+
+    methods: {
+
+      isActive(smartbox, active = "bg-info text-white", inactive = "text-muted") {
+        // TODO IS ACTIVE API CLEANUP
+        return (this.$store.state.local.selected.smartbox === smartbox._id) ? active : inactive;
+      },
+
+      selectMailbox(mailbox) {
+        this.$store.commit('deselect', ['smartbox', 'messages', 'message']);
+        this.$store.commit('select', {
+          type: 'mailbox',
+          id: mailbox._id
+        });
+      },
+
+      messageCount(mailbox) {
+        return this.$store.getters.getMessagesForMailbox( mailbox._id ).length;
+      },
+
+      logout() {
+        this.$store.commit('deselect', ['account', 'mailbox', 'smartbox', 'messages', 'message']);
+      },
+
+    },
+
+    computed: {
+
+      selectedAccountAddress() {
+        const account = (this.$store.getters.getSelectedAccount()||{});
+        let address = account.address;
+        if(address && address.length > 16){
+          address = address.substr(0,15) + '...';
+        }
+        return address;
+      },
+
+      showMore() {
+        return this.$store.state.local.more.mailboxes;
+      },
+
+      mailboxes() {
+        return this.$store.getters.getSelectedAccountMailboxes();
+      },
+
+
+
+
+    },
+
+    template: `
+        <div class="app-mailboxes mb-3">
+
         <div v-if="showMore" class="d-none card">
           <ul class="list-group list-group-flush">
             <li v-for="mailbox in mailboxes" class="list-group-item" v-bind:class="isActive(mailbox)">
@@ -191,7 +207,8 @@ async function main(options) {
 
     methods: {
 
-      isActive(smartbox, active = "active", inactive = "") {
+      isActive(smartbox, active = "bg-info text-white", inactive = "text-muted") {
+        // TODO: Improve isSelected API
         return (this.$store.state.local.selected.smartbox === smartbox.name) ? active : inactive;
       },
 
@@ -204,37 +221,20 @@ async function main(options) {
       },
 
       messageCount(smartbox) {
-        return this.$store.getters
-          .byType('message')
-          .filter(message => message.tags)
-          .filter(message => message.tags.indexOf(smartbox.name) !== -1).length;
+        return this.$store.getters.getSmartboxMessagesForSmartbox(smartbox).length;
       },
 
     },
 
     computed: {
+
       selectedAccountAddress() {
-        const account = (this.$store.getters.byType('account').filter(account => account._id === this.$store.state.local.selected.account)[0] || {});
+        const account = (this.$store.getters.getSelectedAccount()||{});
         return account.address;
       },
 
       smartboxes() {
-        const smartboxes = [];
-        this.$store.getters.byType('mailbox').filter(mailbox => mailbox.pid === this.$store.state.local.selected.account).forEach(mailbox => {
-          this.$store.getters.byType('message').filter(message => message.pid === mailbox._id).forEach(message => {
-            //console.log(message)
-            if (message.tags) message.tags.map(tag => {
-
-                let exists = smartboxes.filter(i => i.name == tag).length;
-                //console.log(tag, exists)
-                if (!exists) smartboxes.push({
-                    name: tag
-                  })
-
-              })
-          })
-        })
-        return smartboxes;
+        return this.$store.getters.getSmartboxes();
       },
 
       showMore() {
@@ -245,17 +245,14 @@ async function main(options) {
 
     template: `
         <div class="app-mailboxes mb-3">
-
-        <ul class="nav nav-pills flex-column">
-          <li  v-for="smartbox in smartboxes" class="nav-item hoverable">
-            <a class="nav-link" v-bind:class="isActive(smartbox)" v-on:click.prevent="selectSmartbox(smartbox)" href="" v-bind:title="smartbox.description">{{smartbox.name}} <span class="badge pull-right px-2 my-1" v-bind:class="isActive(smartbox, 'badge-dark', 'badge-info')">{{messageCount(smartbox)}}</span> </a>
-          </li>
-        </ul>
-
+          <ul class="nav nav-pills flex-column">
+            <li  v-for="smartbox in smartboxes" class="nav-item hoverable">
+              <a class="nav-link" v-bind:class="isActive(smartbox)" v-on:click.prevent="selectSmartbox(smartbox)" href="" v-bind:title="smartbox.description">{{smartbox.name}} <span class="badge pull-right px-2 my-1" v-bind:class="isActive(smartbox, 'badge-dark', 'badge-info')">{{messageCount(smartbox)}}</span> </a>
+            </li>
+          </ul>
         </div>
       `
   });
-
 
   const appMessages = new Vue({
     el: '#app-messages',
@@ -264,7 +261,7 @@ async function main(options) {
     methods: {
 
       isActive(message) {
-
+        // TODO: Improve isSelected API
         return (this.$store.state.local.selected.message === message._id) ? "active" : "";
       },
 
@@ -275,33 +272,34 @@ async function main(options) {
         });
       },
 
+      messageIcon(message) {
+        return `fa fa-${message.icon || 'envelope-open-o'} fa-2x`;
+      },
+
     },
 
     computed: {
 
       messages() {
-        const response = [];
-
-        this.$store.getters.byType('message').filter(message => message.pid === this.$store.state.local.selected.mailbox).forEach(i => response.push(i))
-        this.$store.getters.byType('message').filter(message => message.tags)
-          //.map(i=>{ console.log(this.$store.state.local.selected.smartbox, i.tags, i.tags.indexOf(this.$store.state.local.selected.smartbox)); return i })
-          .filter(message => message.tags.indexOf(this.$store.state.local.selected.smartbox) !== -1).forEach(i => response.push(i))
-        return response;
-
+        return this.$store.getters.getMessagesForSelectedMailbox().concat(
+          this.$store.getters.getMessagesForSelectedSmartbox()
+        );
       },
+
 
     },
 
     template: `
         <div class="app-messages mb-3">
 
-          <div v-if="messages" class="card">
+          <div v-if="messages.length > 0" class="card">
             <ul class="list-group list-group-flush">
               <li v-for="message in messages" class="list-group-item" v-bind:class="isActive(message)">
 
               <div v-on:click="selectMessage(message)" class="p-3">
-                <h6>{{message.name}}</h6>
+                <h5><i v-bind:class="messageIcon(message)"></i> {{message.name}}</h5>
                 <small>{{message.text}}</small>
+                <h6 v-if="message.tags" class="text-muted"> <span class="badge badge-light mr-1" v-for="tag in message.tags">{{tag}}</span> </h6>
               </div>
 
               </li>
@@ -311,8 +309,6 @@ async function main(options) {
         </div>
       `
   });
-
-
 
   const appMessage = new Vue({
     el: '#app-message',
@@ -327,24 +323,25 @@ async function main(options) {
 
       'addbox': require('./message-components/addbox/index.js'),
       'sendmail': require('./message-components/sendmail/index.js'),
+      'capability': require('./message-components/capability/index.js'),
 
     },
 
     data: {
       form: {
-
       }
     },
 
     methods: {
-
-      negative(message) {},
-
-      positive(message) {},
-
       selectMessage(message) {
         this.$store.commit('select', {
           type: 'message',
+          id: message._id
+        });
+      },
+      trash(message) {
+        this.$store.dispatch({
+          type: 'delete',
           id: message._id
         });
       },
@@ -352,11 +349,12 @@ async function main(options) {
 
     computed: {
 
+      message() {
+        return this.$store.getters.getSelectedMessage();
+      },
+
       messageIcon() {
         return `fa fa-${this.message.icon || 'envelope-open-o'} fa-2x`;
-      },
-      message() {
-        return this.$store.getters.byType('message').filter(message => message._id === this.$store.state.local.selected.message)[0];
       },
 
     },
@@ -364,71 +362,38 @@ async function main(options) {
     template: `
         <div class="app-message mb-3">
 
+
+        <div v-if="message" class="mb-3 clearfix">
+        <button v-on:click.prevent="trash(message)" type="button" class="btn btn-outline-secondary btn-sm float-right"><i class="fa fa-trash"></i></button>
+        </div>
+
+        <hr v-if="message">
+
           <div v-if="message" class="card">
-
             <div class="card-body">
-
-            <div class="container-fluid">
-              <div class="row align-items-center">
-
-                <div class="col-4">
-                  <h4 class="text-right">
-                    <span class="py-2 mb-3 d-inline-block">
-                      <i v-bind:class="messageIcon"></i>
-                    </span>
-                  </h4>
-                </div>
-
-                <div class="col-8">
-                  <h4 class="text-left py-2 mb-3">
-                   {{message.name}}
-                  </h4>
-                </div>
-
-              </div>
+              <h4 class="text-left py-2 mb-3"> <i v-bind:class="messageIcon"></i> {{message.name}} </h4>
+              <h6 v-if="message.from" class="card-subtitle pb-2 text-muted"><small>from:</small> {{message.from}}</h6>
+              <h6 v-if="message.tags" class="card-subtitle pb-2 text-fade"> <span class="badge badge-light mr-1" v-for="tag in message.tags">{{tag}}</span> </h6>
             </div>
+          </div>
 
-
-
-
-
-
-
-              <h6 v-if="message.from" class="card-subtitle  pb-3 text-muted mb-3"><small>from:</small> {{message.from}}</h6>
-
+          <div v-if="message" class="card">
+            <div class="card-body">
               <p class="card-text">{{message.text}}</p>
-
             </div>
-
-            <div v-if="message.negative||message.positive" class="card-body">
-            <hr>
-            <a href="#" v-if="message.negative" v-on:click="negative(message)" class="btn btn-danger"><i class="fa fa-times fa-2x"></i></a>
-            <a href="#" v-if="message.positive" v-on:click="positive(message)" class="btn btn-success float-right"><i class="fa fa-check fa-2x"></i></a>
-            </div>
-
             <div v-if="message.component" class="card-body">
-            <terminal v-if="message.component === 'terminal'"></terminal>
-            <adduser v-if="message.component === 'adduser'"></adduser>
-            <deluser v-if="message.component === 'deluser'"></deluser>
-            <addbox v-if="message.component === 'addbox'"></addbox>
-            <sendmail v-if="message.component === 'sendmail'"></sendmail>
+              <terminal v-if="message.component === 'terminal'"></terminal>
+              <adduser v-if="message.component === 'adduser'"></adduser>
+              <deluser v-if="message.component === 'deluser'"></deluser>
+              <addbox v-if="message.component === 'addbox'"></addbox>
+              <sendmail v-if="message.component === 'sendmail'"></sendmail>
+              <capability v-if="message.component === 'capability'"></capability>
             </div>
-
-
-
           </div>
 
         </div>
       `
   });
-
-
-
-
-
-
-
-
 
   const appIdentity = new Vue({
     el: '#app-identity',
@@ -443,8 +408,7 @@ async function main(options) {
     methods: {
 
       login() {
-
-        const account = this.$store.getters.byType('account').filter(account => account.address === this.user)[0];
+        const account = this.$store.getters.getUserAccountByAddress(this.user);
         this.$store.commit('select', {
           type: 'account',
           id: account._id
@@ -457,37 +421,47 @@ async function main(options) {
     computed: {
 
       display() {
+        // TODO: CENTRAL DISPLAY MANAGEMENT
         return !(this.$store.state.local.selected.account)
       },
 
       showPassword() {
-        const account = this.$store.getters.byType('account').filter(account => account.address === this.user);
-        if ((account.length === 1) && (account.password)) {
-          return true;
+        const account = this.$store.getters.getUserAccountByAddress(this.user);
+        if ( (account) && (account.password) ) {
+          return true; // show password input box, the account has a password
         }
       },
 
       showLoginButton() {
-        const account = this.$store.getters.byType('account').filter(account => account.address === this.user);
-        if ((account.length === 1) && (!account.password)) {
+        const account = this.$store.getters.getUserAccountByAddress(this.user);
+        if ( (account) && (!account.password) ) {
           return true;
+        }
+        else if ( (account) && (account.password) ) {
+          const passwordValid = true;
+          if(passwordValid){
+            return true; // show login button password OK
+          }else{
+            return false; // no login withut good password
+          }
         }
       },
 
       userHelp() {
-        const account = this.$store.getters.byType('account').filter(account => account.address === this.user);
-
-        if (account.length === 1) {
+        const account = this.$store.getters.getUserAccountByAddress(this.user);
+        if ( account ) {
+          // account found, no helptext is needed.
           return "";
         } else {
+          // account was not found
           if (this.user) {
+            // but something was typed in
             return `User "${this.user}" Not found.`
           }
         }
-
       },
       accounts() {
-        return this.$store.getters.byType('account'); //
+        return this.$store.getters.getAllAccounts();
       },
 
     },
@@ -497,7 +471,19 @@ async function main(options) {
 
 
             <div class="card text-white bg-dark mb-3" style="margin: 15% 30%; max-width: 30rem;">
-              <div class="card-header"><i class="fa fa-terminal"></i> System Login</div>
+
+              <div class="card-header">
+
+                <span class="fa-stack fa-lg">
+                  <i class="fa fa-square text-dark fa-stack-2x"></i>
+                  <i class="fa fa-terminal fa-stack-1x text-faded"></i>
+                </span>
+
+                System Login
+
+              </div>
+
+
               <div class="card-body">
 
                 <form>
@@ -556,7 +542,6 @@ async function main(options) {
           `
   });
 
-
   const appRecorded = new Vue({
     el: '#app-recorded',
     store,
@@ -591,15 +576,15 @@ async function main(options) {
     template: `
             <div class="d-none app-recorded bg-dark" style="padding:0; margin:0; position: fixed; top:0; left:0; right:0; bottom:0;">
 
-<textarea class="bg-dark text-white border-0" style="padding:1rem; margin:0; position: fixed; top:0; left:0; right:0; bottom:0; width:100%">
-{
-  "_id": "account-administrator-address-book",
-  "pid": "account-administrator",
-  "type": "mailbox",
-  "name": "Address Book",
-  "description": "Address Book for administrator@example.com"
-}
-</textarea>
+            <textarea class="bg-dark text-white border-0" style="padding:1rem; margin:0; position: fixed; top:0; left:0; right:0; bottom:0; width:100%">
+            {
+              "_id": "account-administrator-address-book",
+              "pid": "account-administrator",
+              "type": "mailbox",
+              "name": "Address Book",
+              "description": "Address Book for administrator@example.com"
+            }
+            </textarea>
 
 
             <div class="card text-white bg-dark mb-3" style="padding:0; margin:1rem; position: fixed; bottom:0; right:0;">
@@ -624,8 +609,6 @@ async function main(options) {
             </div>
           `
   });
-
-
 
 
 } // main // /////////////////////////////////////////////////////////////////

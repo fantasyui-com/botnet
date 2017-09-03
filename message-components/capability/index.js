@@ -7,7 +7,8 @@ module.exports = {
         type: "sendmail",
 
         address:"",
-        box:"",
+
+        box:"Actions",
 
         name:"",
         text:"",
@@ -36,7 +37,7 @@ module.exports = {
         <div class="input-group">
         <div class="input-group-btn">
           <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            To
+            For
           </button>
           <div class="dropdown-menu">
             <a v-for="account in accounts" class="dropdown-item" v-on:click="address=account.address" href="#">{{account.address}}</a>
@@ -56,13 +57,28 @@ module.exports = {
         <input v-model="name" class="form-control" id="name" placeholder="Hello">
       </div>
 
+      <div class="form-group">
+        <label for="name">Box</label>
+        <input v-model="box" class="form-control" id="box" placeholder="Actions">
+      </div>
 
       <div class="form-group">
         <label for="text">Text</label>
         <textarea v-model="text" class="form-control" id="text" rows="3"></textarea>
       </div>
 
-
+      <div class="form-group">
+        <label for="component">Capability</label>
+        <select v-model="component" class="form-control" id="component">
+          <option value="">none</option>
+          <option value="addbox">Add Box</option>
+          <option value="adduser">Add User</option>
+          <option value="sendmail">Send Mail</option>
+          <option value="deluser">Delete User</option>
+          <option value="terminal">Terminal</option>
+          <option value="capability">Capability</option>
+        </select>
+      </div>
 
       <hr>
       <button type="button" v-on:click="reset()" class="btn btn-danger"><i class="fa fa-times fa-2x"></i></button>
@@ -82,18 +98,20 @@ module.exports = {
 
          address: this.address,
 
+         box: this.box,
+
          name: this.name,
          text: this.text,
-
+         component: this.component,
 
        });
 
 
        this.address = "";
-
+       this.box = "";
        this.name = "";
        this.text = "";
-
+       this.component = "";
 
        this.$store.commit('deselect', ['messages', 'message']);
 
@@ -103,10 +121,10 @@ module.exports = {
 
 
       this.address = "";
-
+      this.box = "";
       this.name = "";
       this.text = "";
-
+      this.component = "";
 
       this.$store.commit('deselect', ['messages', 'message']);
     },

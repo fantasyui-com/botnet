@@ -1,0 +1,10 @@
+{
+  "_id": "alice-aol-com-inbox-hello",
+  "pid": "alice-aol-com-inbox",
+  "type": "message",
+  "from": "administrator@local",
+  "name": "Welcome",
+  "deleted": true,
+  "text": "Welcome to the system alice@aol.com",
+  "_rev": "1-c69c159f8c5a47a6834b5b64a44e4732"
+}

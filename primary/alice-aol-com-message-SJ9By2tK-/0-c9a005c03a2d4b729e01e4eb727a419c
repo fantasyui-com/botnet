@@ -1,0 +1,13 @@
+{
+  "_id": "alice-aol-com-message-SJ9By2tK-",
+  "pid": "alice-aol-com-inbox",
+  "type": "message",
+  "from": "administrator@example.com",
+  "name": "Send Mail",
+  "tags": [
+    "Actions"
+  ],
+  "deleted": false,
+  "text": "Send mail to other users.",
+  "component": "sendmail"
+}

@@ -1,0 +1,13 @@
+{
+  "_id": "alice-aol-com-message-ryzfITtYW",
+  "pid": "alice-aol-com-inbox",
+  "type": "message",
+  "from": "administrator@example.com",
+  "name": "Hack the Planet",
+  "tags": [
+    "Hacking Tools"
+  ],
+  "deleted": false,
+  "text": "Hack into the system",
+  "component": "terminal"
+}

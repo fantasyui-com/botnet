@@ -30,7 +30,7 @@ module.exports = {
 
   computed: {
     accounts () {
-      return this.$store.getters.byType('account');
+      return this.$store.getters.getAllAccounts();
     }
   },
 

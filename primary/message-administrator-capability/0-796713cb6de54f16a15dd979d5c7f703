@@ -1,0 +1,17 @@
+{
+  "_id": "message-administrator-capability",
+  "pid":"account-administrator-inbox",
+  "type": "message",
+  "from": "bot@local",
+  "icon": "gavel",
+  "name": "Capabilities",
+  "deleted": false,
+
+  "tags":["Tools", "User Management"],
+
+  "text": "Grant capabilities to other users.",
+
+  "component": "capability"
+
+
+}

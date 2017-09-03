@@ -1,0 +1,11 @@
+{
+  "_id": "bob-aol-com-message-SJShxnKKb",
+  "pid": "bob-aol-com-inbox",
+  "type": "message",
+  "from": "alice@aol.com",
+  "name": "Hey Bob, mailtest",
+  "tags": [],
+  "deleted": true,
+  "text": "Testing....",
+  "_rev": "1-32b572f97deb4db99922ffab9a133c40"
+}
