@@ -128,9 +128,9 @@ async function main(options) {
 
     methods: {
 
-      isActive(smartbox, active = "bg-info text-white", inactive = "text-dark") {
+      isActive(mailbox, active = "bg-info text-white", inactive = "text-dark") {
         // TODO IS ACTIVE API CLEANUP
-        return (this.$store.state.local.selected.smartbox === smartbox._id) ? active : inactive;
+        return (this.$store.state.local.selected.mailbox === mailbox._id) ? active : inactive;
       },
 
       selectMailbox(mailbox) {
