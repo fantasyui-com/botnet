@@ -10,7 +10,7 @@
   "name": "botnet",
   "productName": "Botnet",
   "description": "Boilerplate that combines the Bootstrap GUI and Electron Application.",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "main": "main.js",
   "devDependencies": {},
   "scripts": {
