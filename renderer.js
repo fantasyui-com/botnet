@@ -655,4 +655,5 @@ async function main(options) {
 
 main({
   primaryStore: 'primary',
+  primaryLocation: path.join(__dirname, 'primary'),
 });

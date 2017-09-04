@@ -4,7 +4,7 @@ const objectStore = require('multiprocess-store');
 const chokidar = require('chokidar');
 
 module.exports = async function(options){
-let storePath = path.resolve(options.primaryStore);
+let storePath = path.resolve(options.primaryLocation);
 const multiprocessStore = await objectStore.createStore(storePath);
 const multiprocessStorePlugin = function(store){
 
