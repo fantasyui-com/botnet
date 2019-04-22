@@ -3,7 +3,7 @@
     "bcryptjs": "^2.4.3",
     "chokidar": "^2.1.5",
     "lodash": "^4.17.4",
-    "multiprocess-store": "^1.1.7",
+    "multiprocess-store": "^1.2.0",
     "shortid": "^2.2.8",
     "xregexp": "^3.2.0"
   },
