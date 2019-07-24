@@ -2,7 +2,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "chokidar": "^3.0.2",
-    "lodash": "^4.17.14",
+    "lodash": "^4.17.15",
     "multiprocess-store": "^1.4.0",
     "shortid": "^2.2.14",
     "xregexp": "^4.2.4"
